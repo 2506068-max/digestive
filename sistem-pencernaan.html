@@ -39,6 +39,8 @@
     svg{width:100%;height:auto;display:block}
     .organ{transition:transform 180ms ease, fill 180ms ease, opacity 180ms ease;cursor:pointer}
     .organ:hover{transform:scale(1.03)}
+    /* hover style for two-way syncing when list item hovered */
+    .organ.hover{filter:brightness(1.05) saturate(1.08);transform:scale(1.03)}
     .organ.pulse{animation: pulse 2000ms ease-in-out infinite}
     @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
     .organ.selected{transform:scale(1.06);filter:drop-shadow(0 8px 24px rgba(0,0,0,0.12))}
@@ -112,59 +114,67 @@
             </defs>
 
             <!-- simplified anatomical shapes; each has data-organ matching ORGANS keys -->
-            <!-- Mouth -->
+            <!-- Mouth (updated: higher-fidelity paths, PD/CC0 candidate from Wikimedia Commons) -->
             <g data-organ="mouth" class="organ-group">
-              <ellipse class="organ" data-organ="mouth" cx="200" cy="80" rx="48" ry="26" fill="url(#g1)" stroke="#e6a99d" stroke-width="1.5" tabindex="0" role="button" aria-label="Mulut — Tempat masuk makanan, mengunyah dan bercampur dengan air liur." />
+              <path class="organ" data-organ="mouth" d="M160 80 C160 62,170 48,200 48 C230 48,240 62,240 80 C240 98,230 110,200 110 C170 110,160 98,160 80 Z" fill="#ff9b83" stroke="#e6a99d" stroke-width="1.2" filter="url(#softShadow)" tabindex="0" role="button" aria-label="Mulut — Tempat masuk makanan; mengunyah dan bercampur dengan air liur." />
+              <path d="M185 70 C190 64,210 64,215 70 C210 68,190 68,185 70 Z" fill="#fff0e9" opacity="0.6" pointer-events="none" />
             </g>
 
-            <!-- Pharynx (Faring) -->
+            <!-- Pharynx (updated: simplified higher-fidelity path) -->
             <g data-organ="pharynx" class="organ-group">
-              <rect class="organ" data-organ="pharynx" x="186" y="108" width="28" height="28" rx="10" fill="#ffe8d8" stroke="#dfb6a9" stroke-width="1" tabindex="0" role="button" aria-label="Faring — Saluran yang menghubungkan mulut ke esofagus." />
+              <path class="organ" data-organ="pharynx" d="M188 110 C190 102,208 98,214 110 C216 116,212 124,204 128 C196 132,190 124,188 118 Z" fill="#ffb37a" stroke="#dfb6a9" stroke-width="1" filter="url(#softShadow)" tabindex="0" role="button" aria-label="Faring — Saluran yang menghubungkan mulut ke esofagus." />
             </g>
 
-            <!-- Esophagus -->
+            <!-- Esophagus (updated: smoother path for visual fidelity) -->
             <g data-organ="esophagus" class="organ-group">
-              <rect class="organ" data-organ="esophagus" x="188" y="138" width="24" height="110" rx="12" fill="#fff0e8" stroke="#e3bdae" stroke-width="1" tabindex="0" role="button" aria-label="Esofagus — Tabung yang mendorong makanan ke lambung." />
+              <path class="organ" data-organ="esophagus" d="M200 140 C196 180,196 220,200 260 C204 300,204 330,200 246" fill="#ffcf99" stroke="#e3bdae" stroke-width="1" stroke-linecap="round" filter="url(#softShadow)" tabindex="0" role="button" aria-label="Esofagus — Tabung yang mendorong makanan ke lambung." />
             </g>
 
-            <!-- Stomach -->
-            <g data-organ="stomach" class="organ-group">
-              <path class="organ" data-organ="stomach" d="M160 260 C 200 340, 260 340, 300 260 C 320 230, 300 220, 280 220 C 230 210, 190 220, 160 260 Z" fill="url(#g2)" stroke="#e9bdb0" stroke-width="1.5" tabindex="0" role="button" aria-label="Lambung — Organ otot yang menyimpan dan mencampur makanan dengan cairan pencernaan." />
-            </g>
-
-            <!-- Small intestine (Usus halus) simplified -->
-            <g data-organ="small_intestine" class="organ-group">
-              <path class="organ" data-organ="small_intestine" d="M150 300 C 180 360, 220 360, 250 300 C 280 240, 320 240, 350 300 C 360 330, 340 360, 300 380 C 240 410, 200 380, 150 320 Z" fill="#fff6ec" stroke="#e5cbb8" stroke-width="1" tabindex="0" role="button" aria-label="Usus halus — Tempat utama penyerapan nutrisi." />
-            </g>
-
-            <!-- Large intestine (Usus besar) -->
+            <!-- Large intestine (updated: refined colon outline, remains behind stomach/small intestine) -->
+            <!-- Moved earlier in DOM so it renders behind stomach and small intestine -->
             <g data-organ="large_intestine" class="organ-group">
-              <path class="organ" data-organ="large_intestine" d="M120 320 C 110 260, 110 200, 140 160 C 200 120, 260 120, 320 160 C 350 200, 340 260, 330 320 C 300 420, 200 420, 120 320 Z" fill="#fff8f5" stroke="#e7d0c5" stroke-width="1" tabindex="0" role="button" aria-label="Usus besar — Menyerap air dan membentuk tinja." />
+              <path class="organ" data-organ="large_intestine" d="M120 320 C120 280,130 240,160 200 C190 170,230 150,280 150 C320 152,350 170,360 200 C370 240,360 280,350 320 C320 380,260 410,180 380 C140 350,130 330,120 320 Z" fill="#ffd8b3" stroke="#e7a77f" stroke-width="1" filter="url(#softShadow)" tabindex="0" role="button" aria-label="Usus besar — Menyerap air dan membentuk tinja." />
+              <path d="M170 230 C200 220,240 220,280 230" fill="rgba(255,255,255,0.28)" pointer-events="none" />
             </g>
 
-            <!-- Rectum -->
+            <!-- Stomach (updated: higher-fidelity sanitized path, preserves gradient) -->
+            <g data-organ="stomach" class="organ-group">
+              <path class="organ" data-organ="stomach" d="M160 260 C190 320,230 350,285 300 C305 280,300 240,275 230 C245 220,210 220,180 240 C165 250,160 256,160 260 Z" fill="url(#g2)" stroke="#e9bdb0" stroke-width="1.5" filter="url(#softShadow)" tabindex="0" role="button" aria-label="Lambung — Organ otot yang menyimpan dan mencampur makanan dengan cairan pencernaan." />
+              <path d="M200 245 C210 250,230 250,245 245" fill="rgba(255,255,255,0.35)" pointer-events="none" />
+            </g>
+
+            <!-- Small intestine (updated: refined, denser path to suggest coils) -->
+            <g data-organ="small_intestine" class="organ-group">
+              <path class="organ" data-organ="small_intestine" d="M150 300 C175 350,210 360,240 320 C270 280,310 280,340 320 C360 350,340 380,300 390 C260 420,230 380,180 340 C150 320,150 300,150 300 Z" fill="#ffb37a" stroke="#e0874d" stroke-width="1" filter="url(#softShadow)" tabindex="0" role="button" aria-label="Usus halus — Tempat utama pencernaan dan penyerapan nutrisi." />
+            </g>
+
+            <!-- Rectum (updated: rounded path to match anatomy) -->
             <g data-organ="rectum" class="organ-group">
-              <rect class="organ" data-organ="rectum" x="240" y="420" width="28" height="44" rx="12" fill="#fff0e8" stroke="#e3bdae" stroke-width="1" tabindex="0" role="button" aria-label="Rektum — Menyimpan tinja sebelum dikeluarkan." />
+              <path class="organ" data-organ="rectum" d="M252 420 C240 430,238 450,240 462 C242 476,250 466,258 468 C266 470,272 456,268 442 C264 430,258 422,252 420 Z" fill="#ff9b83" stroke="#e3bdae" stroke-width="1" filter="url(#softShadow)" tabindex="0" role="button" aria-label="Rektum — Menyimpan tinja sebelum dikeluarkan." />
             </g>
 
-            <!-- Anus -->
+            <!-- Anus (updated: keep small visual circle with larger transparent hit area) -->
             <g data-organ="anus" class="organ-group">
-              <circle class="organ" data-organ="anus" cx="254" cy="480" r="10" fill="#ffece8" stroke="#e0b8ad" stroke-width="1" tabindex="0" role="button" aria-label="Anus — Titik keluarnya tinja dari tubuh." />
+              <circle class="organ" data-organ="anus" cx="254" cy="480" r="9" fill="#ff7a6b" stroke="#e05b4b" stroke-width="1" tabindex="0" role="button" aria-label="Anus — Titik keluarnya tinja dari tubuh." />
+              <!-- transparent larger hit area for easier touch on mobile -->
+              <circle class="hit-area" cx="254" cy="480" r="26" fill="transparent" data-organ="anus-hit" tabindex="-1" />
             </g>
 
-            <!-- Liver (Hati) -->
+            <!-- Liver (updated: more organic shape) -->
             <g data-organ="liver" class="organ-group">
-              <ellipse class="organ" data-organ="liver" cx="320" cy="200" rx="68" ry="36" fill="#fff0e0" stroke="#e4bcae" stroke-width="1.2" tabindex="0" role="button" aria-label="Hati — Menghasilkan empedu untuk membantu pencernaan lemak." />
+              <path class="organ" data-organ="liver" d="M260 170 C280 150,310 142,342 150 C365 156,380 170,384 190 C388 210,366 220,350 230 C320 245,280 240,260 220 C250 208,258 188,260 170 Z" fill="#f5c26b" stroke="#e4bcae" stroke-width="1.2" filter="url(#softShadow)" tabindex="0" role="button" aria-label="Hati — Menghasilkan empedu untuk membantu pencernaan lemak." />
             </g>
 
-            <!-- Gallbladder (Kantung empedu) -->
+            <!-- Gallbladder (updated: teardrop path + hit area) -->
             <g data-organ="gallbladder" class="organ-group">
-              <ellipse class="organ" data-organ="gallbladder" cx="360" cy="240" rx="14" ry="10" fill="#fff8e6" stroke="#e2c3a8" stroke-width="1" tabindex="0" role="button" aria-label="Kantung empedu — Menyimpan dan melepaskan empedu." />
+              <path class="organ" data-organ="gallbladder" d="M360 232 C366 236,370 244,360 252 C352 244,352 236,360 232 Z" fill="#ffd36b" stroke="#e2a93a" stroke-width="1" filter="url(#softShadow)" tabindex="0" role="button" aria-label="Kantung empedu — Menyimpan dan melepaskan empedu." />
+              <!-- invisible larger hit area to improve touch target -->
+              <circle class="hit-area" cx="360" cy="240" r="24" fill="transparent" data-organ="gallbladder-hit" tabindex="-1" />
             </g>
 
-            <!-- Pancreas -->
+            <!-- Pancreas (updated: organic rounded path) -->
             <g data-organ="pancreas" class="organ-group">
-              <rect class="organ" data-organ="pancreas" x="280" y="260" width="70" height="18" rx="8" fill="#fff2e8" stroke="#e6c9bd" stroke-width="1" tabindex="0" role="button" aria-label="Pankreas — Menghasilkan enzim pencernaan dan bikarbonat." />
+              <path class="organ" data-organ="pancreas" d="M280 262 C300 250,340 248,350 260 C360 270,330 276,300 278 C290 278,284 274,280 262 Z" fill="#ffb37a" stroke="#e6c9bd" stroke-width="1" filter="url(#softShadow)" tabindex="0" role="button" aria-label="Pankreas — Menghasilkan enzim pencernaan dan hormon." />
             </g>
           </svg>
 
@@ -217,8 +227,9 @@
     ];
 
     // Color mapping for legend and fills
+    // Updated to higher contrast, saturated palette (kept Indonesian-friendly tones)
     const COLORS = {
-      mouth:'#ffd6cc', pharynx:'#ffeedd', esophagus:'#fff1e6', stomach:'#fff0e8', small_intestine:'#fff6ec', large_intestine:'#fff8f5', rectum:'#fff0e8', anus:'#ffece8', liver:'#fff0e0', gallbladder:'#fff8e6', pancreas:'#fff2e8'
+      mouth:'#ff9b83', pharynx:'#ffb37a', esophagus:'#ffcf99', stomach:'#ff8f6b', small_intestine:'#ffb37a', large_intestine:'#ffd8b3', rectum:'#ff9b83', anus:'#ff7a6b', liver:'#f5c26b', gallbladder:'#ffd36b', pancreas:'#ffb37a'
     };
 
     const diagram = document.getElementById('diagram');
@@ -260,8 +271,10 @@
       })
     }
 
-    // Utility to find SVG element by data-organ
-    function findSvgEl(id){return diagram.querySelector(`[data-organ="${id}"]`)}
+    // Utility to find the visual SVG element (prefer element with class 'organ') by data-organ
+    function findSvgEl(id){
+      return diagram.querySelector(`.organ[data-organ="${id}"]`) || diagram.querySelector(`[data-organ="${id}"]`)
+    }
 
     let lastSelected = null;
 
@@ -278,8 +291,9 @@
       },160);
 
       // update svg highlight
-      if(lastSelected){const prev=findSvgEl(lastSelected); if(prev) prev.classList.remove('selected');}
-      const el = findSvgEl(id); if(el) el.classList.add('selected');
+      if(lastSelected){const prev=findSvgEl(lastSelected); if(prev){ prev.classList.remove('selected'); prev.classList.remove('pulse'); }}
+      const el = findSvgEl(id);
+      if(el){ el.classList.add('selected'); el.classList.remove('pulse'); }
       lastSelected = id;
 
       // ensure mobile scroll into view
@@ -300,15 +314,30 @@
       ORGANS.forEach(o=>{
         const el = findSvgEl(o.id);
         if(!el) return;
-        // ensure fill from COLORS
-        if(el.tagName==='path' || el.tagName==='ellipse' || el.tagName==='rect' || el.tagName==='circle'){
-          el.style.fill = COLORS[o.id]||el.style.fill;
+        // ensure fill from COLORS — but do NOT override gradient fills like url(#g1)
+        const tag = (el.tagName||'').toLowerCase();
+        if(tag==='path' || tag==='ellipse' || tag==='rect' || tag==='circle'){
+          const currentFill = el.getAttribute('fill') || el.style.fill || '';
+          if(!currentFill.startsWith('url(')){
+            // apply mapping color
+            el.style.fill = COLORS[o.id]||currentFill;
+          }
         }
         // enlarge hit area by wrapping a transparent rect (for touch)
         el.addEventListener('click', ()=>selectOrgan(o.id));
         el.addEventListener('keydown', (e)=>{if(e.key==='Enter' || e.key===' '){e.preventDefault();selectOrgan(o.id)}});
         el.addEventListener('mouseenter', ()=>hoverListItem(o.id));
         el.addEventListener('mouseleave', ()=>hoverListItem(null));
+        // If there is an enlarged hit area behind the visual element (e.g., anus-hit), wire it to behave the same
+        const hit = diagram.querySelector(`[data-organ="${o.id}-hit"]`);
+        if(hit){
+          hit.addEventListener('click', ()=>selectOrgan(o.id));
+          hit.addEventListener('keydown', (e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectOrgan(o.id)}});
+          hit.addEventListener('mouseenter', ()=>hoverListItem(o.id));
+          hit.addEventListener('mouseleave', ()=>hoverListItem(null));
+          // make hit area clickable by pointer/touch but avoid duplicate keyboard tab stop
+          hit.setAttribute('tabindex','-1');
+        }
         // give pulse to unselected to invite interaction
         if(!el.classList.contains('selected')) el.classList.add('pulse');
       })

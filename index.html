@@ -42,7 +42,7 @@
     .touch-pad{display:inline-block;width:var(--touch);height:var(--touch)}
     @media (prefers-reduced-motion: reduce){.organ.pulse, .organ, .detail .content{animation:none;transition:none}}
   </style>
-  <script type="module" crossorigin src="assets/index-B5Qt9EMX.js"></script>
+  <script type="module" crossorigin src="/assets/index-B5Qt9EMX.js"></script>
 </head>
 <body>
 <!-- Inline single-file interactive page content (copied from sistem-pencernaan.html) -->
@@ -56,7 +56,7 @@
 
 <!-- Using a minimal approach: inject the entire page HTML into body -->
 <script>
-fetch('sistem-pencernaan.html').then(r=>r.text()).then(t=>{document.body.innerHTML = t}).catch(()=>{ /* fallback: load embedded content directly if fetch fails */ });
+fetch('/sistem-pencernaan.html').then(r=>r.text()).then(t=>{document.body.innerHTML = t}).catch(()=>{ /* fallback: load embedded content directly if fetch fails */ });
 </script>
 
 </body>

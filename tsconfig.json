@@ -6,6 +6,7 @@
     "jsx": "react-jsx",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "types": ["vitest/globals", "vite/client"],
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

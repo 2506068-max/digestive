@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 1200" width="600" height="1200">
+  <defs>
+    <style> .skin{fill:#f6e7e1;stroke:#d8bfb6;stroke-width:2} .organ{fill:#ffece6;stroke:#e8b6ac;stroke-width:1.5}</style>
+  </defs>
+  <!-- simplified realistic-looking shapes for demo -->
+  <g transform="translate(50,20)">
+    <ellipse class="skin" cx="250" cy="80" rx="80" ry="45"/>
+    <rect class="organ" x="230" y="120" width="40" height="160" rx="18"/>
+    <path class="organ" d="M200 300 C 240 420, 260 420, 300 300 L 300 420 C 260 520, 240 520, 200 420 Z"/>
+    <ellipse class="organ" cx="330" cy="220" rx="70" ry="40"/>
+  </g>
+</svg>

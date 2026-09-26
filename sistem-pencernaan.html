@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Atlas Pencernaan — Jelajahi Sistem Pencernaan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#fbfbfa;
+      --card:#ffffff;
+      --text:#062541;
+      --muted:#58616b;
+      --accent:#0b3b66;
+      --highlight:#ff7a6b;
+      --soft:#f6f7f9;
+      --shadow: 0 8px 24px rgba(10,20,30,0.08);
+      --radius:14px;
+      --touch:44px;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{ --bg:#071126; --card:#0b1724; --text:#e6eef8; --muted:#99a6b8; --soft:#071827 }
+    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+    .wrap{max-width:1100px;margin:24px auto;padding:20px}
+    header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+    h1{font-size:28px;margin:0 0 6px 0}
+    p.lead{margin:0;color:var(--muted)}
+
+    .hero{display:flex;gap:20px;align-items:center;padding:18px;border-radius:16px;background:linear-gradient(180deg,rgba(11,59,102,0.04),transparent)}
+
+    .layout{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-top:18px}
+    @media(max-width:900px){.layout{grid-template-columns:1fr}}
+
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+    .diagram{display:flex;gap:16px;align-items:flex-start}
+
+    /* SVG organ styles */
+    svg{width:100%;height:auto;display:block}
+    .organ{transition:transform 180ms ease, fill 180ms ease, opacity 180ms ease;cursor:pointer}
+    .organ:hover{transform:scale(1.03)}
+    .organ.pulse{animation: pulse 2000ms ease-in-out infinite}
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+    .organ.selected{transform:scale(1.06);filter:drop-shadow(0 8px 24px rgba(0,0,0,0.12))}
+
+    .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .legend-item{display:flex;align-items:center;gap:8px;font-size:13px}
+    .swatch{width:16px;height:16px;border-radius:4px}
+
+    /* list */
+    .org-list{margin:10px 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+    .org-item{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:10px}
+    .org-btn{display:flex;align-items:center;gap:10px;border:0;background:transparent;padding:6px;width:100%;text-align:left}
+    .org-btn:focus{outline:2px solid rgba(20,115,230,0.12);box-shadow:0 0 0 4px rgba(20,115,230,0.06);border-radius:8px}
+
+    .detail{position:relative}
+    .detail .content{min-height:140px;transition:opacity 200ms ease,transform 200ms ease}
+    .detail .content.hidden{opacity:0;transform:translateY(8px)}
+
+    .back-top{position:fixed;right:18px;bottom:18px;background:var(--accent);color:white;border-radius:10px;padding:8px 10px;border:none;box-shadow:var(--shadow);cursor:pointer}
+
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px}
+    .modal .inner{background:var(--card);border-radius:12px;padding:12px;max-width:900px;width:100%}
+
+    /* ensure touch targets */
+    .hit-area{pointer-events:auto}
+    .touch-pad{display:inline-block;width:var(--touch);height:var(--touch)}
+
+    /* reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      .organ.pulse, .organ, .detail .content{animation:none;transition:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Kenali Sistem Pencernaanmu</h1>
+        <p class="lead">Temukan bagaimana makanan bergerak, fungsi setiap organ, dan fakta menarik tentang pencernaan.</p>
+      </div>
+      <div>
+        <button id="startBtn" class="org-btn" aria-label="Mulai Eksplorasi">Mulai Eksplorasi</button>
+      </div>
+    </header>
+
+    <section class="hero card">
+      <div style="flex:1">
+        <h2 style="margin:0 0 8px 0">Explore</h2>
+        <p class="lead">Klik organ pada diagram atau dari daftar untuk melihat detail singkat. Gunakan keyboard (Tab + Enter/Spasi).</p>
+        <div id="legend" class="legend" aria-hidden="false"></div>
+      </div>
+    </section>
+
+    <main class="layout">
+      <div>
+        <div class="card diagram" aria-label="Diagram sistem pencernaan">
+          <!-- SVG with gradients and soft depth -->
+          <svg id="diagram" viewBox="0 0 400 900" role="img" aria-label="Diagram interaktif sistem pencernaan">
+            <defs>
+              <radialGradient id="g1" cx="30%" cy="20%">
+                <stop offset="0%" stop-color="#fff6f3" />
+                <stop offset="100%" stop-color="#ffecec" />
+              </radialGradient>
+              <radialGradient id="g2" cx="40%" cy="30%">
+                <stop offset="0%" stop-color="#fffef8" />
+                <stop offset="100%" stop-color="#fff1e6" />
+              </radialGradient>
+              <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.12" />
+              </filter>
+            </defs>
+
+            <!-- simplified anatomical shapes; each has data-organ matching ORGANS keys -->
+            <!-- Mouth -->
+            <g data-organ="mouth" class="organ-group">
+              <ellipse class="organ" data-organ="mouth" cx="200" cy="80" rx="48" ry="26" fill="url(#g1)" stroke="#e6a99d" stroke-width="1.5" tabindex="0" role="button" aria-label="Mulut — Tempat masuk makanan, mengunyah dan bercampur dengan air liur." />
+            </g>
+
+            <!-- Pharynx (Faring) -->
+            <g data-organ="pharynx" class="organ-group">
+              <rect class="organ" data-organ="pharynx" x="186" y="108" width="28" height="28" rx="10" fill="#ffe8d8" stroke="#dfb6a9" stroke-width="1" tabindex="0" role="button" aria-label="Faring — Saluran yang menghubungkan mulut ke esofagus." />
+            </g>
+
+            <!-- Esophagus -->
+            <g data-organ="esophagus" class="organ-group">
+              <rect class="organ" data-organ="esophagus" x="188" y="138" width="24" height="110" rx="12" fill="#fff0e8" stroke="#e3bdae" stroke-width="1" tabindex="0" role="button" aria-label="Esofagus — Tabung yang mendorong makanan ke lambung." />
+            </g>
+
+            <!-- Stomach -->
+            <g data-organ="stomach" class="organ-group">
+              <path class="organ" data-organ="stomach" d="M160 260 C 200 340, 260 340, 300 260 C 320 230, 300 220, 280 220 C 230 210, 190 220, 160 260 Z" fill="url(#g2)" stroke="#e9bdb0" stroke-width="1.5" tabindex="0" role="button" aria-label="Lambung — Organ otot yang menyimpan dan mencampur makanan dengan cairan pencernaan." />
+            </g>
+
+            <!-- Small intestine (Usus halus) simplified -->
+            <g data-organ="small_intestine" class="organ-group">
+              <path class="organ" data-organ="small_intestine" d="M150 300 C 180 360, 220 360, 250 300 C 280 240, 320 240, 350 300 C 360 330, 340 360, 300 380 C 240 410, 200 380, 150 320 Z" fill="#fff6ec" stroke="#e5cbb8" stroke-width="1" tabindex="0" role="button" aria-label="Usus halus — Tempat utama penyerapan nutrisi." />
+            </g>
+
+            <!-- Large intestine (Usus besar) -->
+            <g data-organ="large_intestine" class="organ-group">
+              <path class="organ" data-organ="large_intestine" d="M120 320 C 110 260, 110 200, 140 160 C 200 120, 260 120, 320 160 C 350 200, 340 260, 330 320 C 300 420, 200 420, 120 320 Z" fill="#fff8f5" stroke="#e7d0c5" stroke-width="1" tabindex="0" role="button" aria-label="Usus besar — Menyerap air dan membentuk tinja." />
+            </g>
+
+            <!-- Rectum -->
+            <g data-organ="rectum" class="organ-group">
+              <rect class="organ" data-organ="rectum" x="240" y="420" width="28" height="44" rx="12" fill="#fff0e8" stroke="#e3bdae" stroke-width="1" tabindex="0" role="button" aria-label="Rektum — Menyimpan tinja sebelum dikeluarkan." />
+            </g>
+
+            <!-- Anus -->
+            <g data-organ="anus" class="organ-group">
+              <circle class="organ" data-organ="anus" cx="254" cy="480" r="10" fill="#ffece8" stroke="#e0b8ad" stroke-width="1" tabindex="0" role="button" aria-label="Anus — Titik keluarnya tinja dari tubuh." />
+            </g>
+
+            <!-- Liver (Hati) -->
+            <g data-organ="liver" class="organ-group">
+              <ellipse class="organ" data-organ="liver" cx="320" cy="200" rx="68" ry="36" fill="#fff0e0" stroke="#e4bcae" stroke-width="1.2" tabindex="0" role="button" aria-label="Hati — Menghasilkan empedu untuk membantu pencernaan lemak." />
+            </g>
+
+            <!-- Gallbladder (Kantung empedu) -->
+            <g data-organ="gallbladder" class="organ-group">
+              <ellipse class="organ" data-organ="gallbladder" cx="360" cy="240" rx="14" ry="10" fill="#fff8e6" stroke="#e2c3a8" stroke-width="1" tabindex="0" role="button" aria-label="Kantung empedu — Menyimpan dan melepaskan empedu." />
+            </g>
+
+            <!-- Pancreas -->
+            <g data-organ="pancreas" class="organ-group">
+              <rect class="organ" data-organ="pancreas" x="280" y="260" width="70" height="18" rx="8" fill="#fff2e8" stroke="#e6c9bd" stroke-width="1" tabindex="0" role="button" aria-label="Pankreas — Menghasilkan enzim pencernaan dan bikarbonat." />
+            </g>
+          </svg>
+
+        </div>
+
+        <div class="card" id="listCard" aria-label="Daftar lengkap organ">
+          <h3 style="margin:0 0 8px 0">Daftar Lengkap Organ</h3>
+          <ul id="orgList" class="org-list" role="list"></ul>
+        </div>
+      </div>
+
+      <aside class="card detail" id="detailCard">
+        <div class="content" id="detailContent">
+          <h3 id="detailName">Pilih organ</h3>
+          <p id="detailDesc">Klik organ pada diagram untuk melihat penjelasan singkat.</p>
+          <h4 id="detailFunctionsTitle" style="margin-top:12px">Fungsi utama</h4>
+          <ul id="detailFunctions"></ul>
+        </div>
+      </aside>
+    </main>
+
+    <button id="backTop" class="back-top" aria-label="Kembali ke atas">Atas</button>
+
+    <!-- modal anatomy viewer -->
+    <div id="modal" class="modal" hidden>
+      <div class="inner">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3 id="modalTitle">Anatomi Detail</h3>
+          <button id="modalClose" class="org-btn" aria-label="Tutup">Tutup</button>
+        </div>
+        <div id="modalBody" style="margin-top:8px;max-height:70vh;overflow:auto"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Centralized ORGANS data (Indonesian) — structure must be preserved as per AGENT.md
+    const ORGANS = [
+      {id:'mouth', name:'Mulut', englishName:'Mouth', description:'Tempat masuk makanan; mengunyah dan bercampur dengan air liur.', functions:['Mengunyah makanan','Mencampur dengan air liur','Memulai pencernaan karbohidrat']},
+      {id:'pharynx', name:'Faring', englishName:'Pharynx', description:'Saluran yang menghubungkan mulut ke esofagus.', functions:['Menyalurkan bolus makanan ke esofagus','Mencegah makanan masuk saluran napas']},
+      {id:'esophagus', name:'Esofagus', englishName:'Esophagus', description:'Tabung yang mendorong makanan ke lambung.', functions:['Menggerakkan makanan ke lambung melalui peristaltik']},
+      {id:'stomach', name:'Lambung', englishName:'Stomach', description:'Organ otot yang menyimpan dan mencampur makanan dengan cairan pencernaan.', functions:['Menyimpan makanan','Mencampur dan mencerna protein','Mengatur masuknya makanan ke usus halus'], parts:[{id:'cardia',name:'Kardia',description:'Pintu masuk dari esofagus'},{id:'fundus',name:'Fundus'},{id:'body',name:'Badan'},{id:'antrum',name:'Antrum'},{id:'pylorus',name:'Pilorus'}]},
+      {id:'small_intestine', name:'Usus halus', englishName:'Small intestine', description:'Tempat utama pencernaan dan penyerapan nutrisi.', functions:['Mencerna nutrisi','Menyerap nutrisi ke aliran darah'], parts:[{id:'duodenum',name:'Duodenum'},{id:'jejunum',name:'Jejunum'},{id:'ileum',name:'Ileum'}]},
+      {id:'large_intestine', name:'Usus besar', englishName:'Large intestine', description:'Menyerap air dan membentuk tinja.', functions:['Menyerap air','Membentuk dan menyimpan tinja']},
+      {id:'rectum', name:'Rektum', englishName:'Rectum', description:'Menyimpan tinja sebelum dikeluarkan.', functions:['Menyimpan tinja sebelum defekasi']},
+      {id:'anus', name:'Anus', englishName:'Anus', description:'Titik keluarnya tinja dari tubuh.', functions:['Kontrol pengeluaran tinja']},
+      {id:'liver', name:'Hati', englishName:'Liver', description:'Menghasilkan empedu yang membantu mencerna lemak.', functions:['Memproduksi empedu','Metabolisme nutrisi']},
+      {id:'gallbladder', name:'Kantung empedu', englishName:'Gallbladder', description:'Menyimpan dan melepaskan empedu.', functions:['Menyimpan empedu','Mengeluarkan empedu ke usus dua belas jari']},
+      {id:'pancreas', name:'Pankreas', englishName:'Pancreas', description:'Menghasilkan enzim pencernaan dan hormon.', functions:['Memproduksi enzim pencernaan','Menghasilkan hormon seperti insulin']}
+    ];
+
+    // Color mapping for legend and fills
+    const COLORS = {
+      mouth:'#ffd6cc', pharynx:'#ffeedd', esophagus:'#fff1e6', stomach:'#fff0e8', small_intestine:'#fff6ec', large_intestine:'#fff8f5', rectum:'#fff0e8', anus:'#ffece8', liver:'#fff0e0', gallbladder:'#fff8e6', pancreas:'#fff2e8'
+    };
+
+    const diagram = document.getElementById('diagram');
+    const orgList = document.getElementById('orgList');
+    const detailName = document.getElementById('detailName');
+    const detailDesc = document.getElementById('detailDesc');
+    const detailFunctions = document.getElementById('detailFunctions');
+    const detailContent = document.getElementById('detailContent');
+    const legend = document.getElementById('legend');
+    const modal = document.getElementById('modal');
+    const modalBody = document.getElementById('modalBody');
+    const modalTitle = document.getElementById('modalTitle');
+
+    // Render legend
+    function renderLegend(){
+      ORGANS.forEach(o=>{
+        const item = document.createElement('div');item.className='legend-item';
+        const sw = document.createElement('span');sw.className='swatch';sw.style.background=COLORS[o.id]||'#eee';
+        item.appendChild(sw);
+        const label = document.createElement('div');label.textContent=o.name;
+        item.appendChild(label);
+        legend.appendChild(item);
+      })
+    }
+
+    // Render list
+    function renderList(){
+      ORGANS.forEach(o=>{
+        const li = document.createElement('li');li.className='org-item card';li.style.display='flex';
+        const btn = document.createElement('button');btn.className='org-btn';btn.setAttribute('data-id',o.id);btn.innerHTML=`<span style="width:12px;height:12px;background:${COLORS[o.id]||'#eee'};border-radius:4px;display:inline-block"></span><div style="flex:1">${o.name}<div style='font-size:12px;color:var(--muted)'>${o.englishName||''}</div></div>`;
+        btn.onclick = ()=>selectOrgan(o.id);
+        btn.onmouseenter = ()=>hoverOrgan(o.id);
+        btn.onmouseleave = ()=>hoverOrgan(null);
+        btn.onfocus = ()=>hoverOrgan(o.id);
+        btn.onblur = ()=>hoverOrgan(null);
+        btn.onkeydown = (e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectOrgan(o.id)}};
+        li.appendChild(btn);
+        orgList.appendChild(li);
+      })
+    }
+
+    // Utility to find SVG element by data-organ
+    function findSvgEl(id){return diagram.querySelector(`[data-organ="${id}"]`)}
+
+    let lastSelected = null;
+
+    function selectOrgan(id){
+      const organ = ORGANS.find(o=>o.id===id);if(!organ) return;
+      // animate content change
+      detailContent.classList.add('hidden');
+      setTimeout(()=>{
+        detailName.textContent = organ.name;
+        detailDesc.textContent = organ.description;
+        detailFunctions.innerHTML='';
+        (organ.functions||[]).forEach(f=>{const li=document.createElement('li');li.textContent=f;detailFunctions.appendChild(li)});
+        detailContent.classList.remove('hidden');
+      },160);
+
+      // update svg highlight
+      if(lastSelected){const prev=findSvgEl(lastSelected); if(prev) prev.classList.remove('selected');}
+      const el = findSvgEl(id); if(el) el.classList.add('selected');
+      lastSelected = id;
+
+      // ensure mobile scroll into view
+      if(window.innerWidth <= 900){
+        document.getElementById('detailCard').scrollIntoView({behavior:'smooth',block:'center'});
+      }
+    }
+
+    function hoverOrgan(id){
+      // apply hover styles both on svg and list
+      ORGANS.forEach(o=>{
+        const el = findSvgEl(o.id);
+        if(el){if(id===o.id){el.classList.add('hover');}else{el.classList.remove('hover');}}
+      })
+    }
+
+    function wireSvg(){
+      ORGANS.forEach(o=>{
+        const el = findSvgEl(o.id);
+        if(!el) return;
+        // ensure fill from COLORS
+        if(el.tagName==='path' || el.tagName==='ellipse' || el.tagName==='rect' || el.tagName==='circle'){
+          el.style.fill = COLORS[o.id]||el.style.fill;
+        }
+        // enlarge hit area by wrapping a transparent rect (for touch)
+        el.addEventListener('click', ()=>selectOrgan(o.id));
+        el.addEventListener('keydown', (e)=>{if(e.key==='Enter' || e.key===' '){e.preventDefault();selectOrgan(o.id)}});
+        el.addEventListener('mouseenter', ()=>hoverListItem(o.id));
+        el.addEventListener('mouseleave', ()=>hoverListItem(null));
+        // give pulse to unselected to invite interaction
+        if(!el.classList.contains('selected')) el.classList.add('pulse');
+      })
+    }
+
+    function hoverListItem(id){
+      // find corresponding list button and apply focus-like style
+      const btn = orgList.querySelector(`[data-id="${id}"]`);
+      // clear
+      orgList.querySelectorAll('.org-btn').forEach(b=>b.style.background='');
+      if(btn) btn.style.background='rgba(11,59,102,0.04)';
+    }
+
+    // back to top
+    document.getElementById('backTop').addEventListener('click', ()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+    // modal viewer
+    document.getElementById('modalClose').addEventListener('click', ()=>{modal.hidden=true});
+
+    // start button scroll
+    document.getElementById('startBtn').addEventListener('click', ()=>{document.getElementById('diagram').scrollIntoView({behavior:'smooth',block:'center'})});
+
+    // init
+    renderLegend();renderList();wireSvg();
+
+    // Accessibility: keyboard tab order for svg elements
+    // ensure organs are reachable via tabindex
+    ORGANS.forEach(o=>{
+      const el = findSvgEl(o.id);
+      if(el) el.setAttribute('tabindex','0');
+    })
+
+    // Basic check: ensure all organs present and clickable
+    window.addEventListener('load', ()=>{
+      const missing = ORGANS.filter(o=>!findSvgEl(o.id)).map(o=>o.id);
+      if(missing.length>0){console.warn('Organ shapes missing for:',missing)}
+    })
+  </script>
+</body>
+</html>
